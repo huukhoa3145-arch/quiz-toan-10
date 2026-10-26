@@ -1,0 +1,650 @@
+<!-- title: Bài Kiểm Tra Tương Tác Toán 10 (Chương 1 - 3) -->
+<!-- filepath: index.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Kiểm Tra Tương Tác Toán Lớp 10 - Chương 1 đến 3</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- MathJax for Math Rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-xl font-bold">Kiểm Tra Toán Lớp 10 (Chương 1 - 3)</h1>
+                <p class="text-xs text-indigo-200">Mệnh đề & Tập hợp | Bất phương trình bậc nhất 2 ẩn | Hệ thức lượng trong tam giác</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="timer-box" class="bg-indigo-700 px-4 py-2 rounded-lg font-mono text-sm font-semibold shadow-inner flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span id="time-display">45:00</span>
+                </div>
+                <button onclick="confirmSubmit()" id="btn-submit-header" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-5 py-2 rounded-lg shadow transition transform active:scale-95 text-sm cursor-pointer">
+                    Nộp Bài
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="max-w-7xl mx-auto mt-3 bg-indigo-900/50 rounded-full h-2 overflow-hidden">
+            <div id="progress-bar" class="bg-emerald-400 h-full w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto w-full flex-grow p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Question Palette (Sidebar) -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-fit sticky top-24">
+            <h2 class="font-semibold text-slate-700 mb-3 text-sm flex justify-between items-center">
+                <span>Danh sách câu hỏi</span>
+                <span id="answered-count" class="text-xs font-normal text-slate-500">0/20 đã làm</span>
+            </h2>
+            <div id="question-palette" class="grid grid-cols-5 gap-2 max-h-[60vh] overflow-y-auto p-1">
+                <!-- Dynamic palette buttons -->
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-2 text-xs text-slate-500">
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Đã trả lời</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Chưa trả lời</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded border-2 border-indigo-600 inline-block"></span> Câu đang xem</div>
+            </div>
+        </div>
+
+        <!-- Question Content Area -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+            <div id="quiz-container" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 flex flex-col justify-between min-h-[480px]">
+                <!-- Dynamic Question Content -->
+                <div id="question-card">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex justify-between items-center mt-8 pt-4 border-t border-slate-100">
+                    <button onclick="prevQuestion()" id="btn-prev" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Câu trước
+                    </button>
+                    <span id="question-indicator" class="text-sm font-medium text-slate-500">Câu 1 / 20</span>
+                    <button onclick="nextQuestion()" id="btn-next" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition flex items-center gap-1 cursor-pointer">
+                        Câu sau <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 flex flex-col gap-6">
+            <div class="text-center pb-4 border-b border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800">Kết Quả Bài Kiểm Tra</h2>
+                <p class="text-sm text-slate-500 mt-1">Tổng hợp điểm số và đánh giá đáp án chi tiết</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                    <div class="text-xs text-indigo-600 font-semibold uppercase">Tổng Điểm Ước Tính</div>
+                    <div id="res-score" class="text-3xl font-bold text-indigo-700 mt-1">0.0 / 10</div>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                    <div class="text-xs text-emerald-600 font-semibold uppercase">Trắc nghiệm & Đúng/Sai</div>
+                    <div id="res-objective" class="text-3xl font-bold text-emerald-700 mt-1">0 / 16</div>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                    <div class="text-xs text-amber-600 font-semibold uppercase">Điểm Tự luận</div>
+                    <div id="res-essay" class="text-3xl font-bold text-amber-700 mt-1">0.0 / 2.0</div>
+                </div>
+            </div>
+
+            <div id="detailed-review" class="flex flex-col gap-4 mt-2">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button onclick="closeResultModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition cursor-pointer">Xem lại bài làm</button>
+                <button onclick="resetQuiz()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition cursor-pointer">Làm lại bài</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center flex flex-col gap-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">!</div>
+            <h3 class="text-lg font-bold text-slate-800">Xác nhận nộp bài?</h3>
+            <p id="confirm-msg" class="text-sm text-slate-600">Bạn vẫn còn câu hỏi chưa hoàn thành. Bạn có chắc chắn muốn nộp bài?</p>
+            <div class="flex gap-3 justify-center mt-2">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition cursor-pointer">Tiếp tục làm bài</button>
+                <button onclick="submitQuiz()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg text-sm transition cursor-pointer">Xác nhận nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // 20 Questions Database (Grade 10 Math: Ch 1-3)
+        const questions = [
+            // --- TRẮC NGHIỆM (8 câu: Q1 - Q8) ---
+            {
+                id: 1, type: 'mc',
+                question: "Trong các phát biểu sau, phát biểu nào là một mệnh đề toán học?",
+                options: [
+                    "Hôm nay thời tiết đẹp quá!",
+                    "Số 2024 có chia hết cho 3 hay không?",
+                    "$\\sqrt{2}$ là một số vô tỷ.",
+                    "Hãy giải phương trình $x^2 - 4 = 0$."
+                ],
+                correct: 2,
+                explanation: "Mệnh đề toán học là một khẳng định đúng hoặc sai liên quan đến đối tượng toán học. '$\\sqrt{2}$ là một số vô tỷ' là một khẳng định toán học đúng.",
+                points: 0.5
+            },
+            {
+                id: 2, type: 'mc',
+                question: "Cho tập hợp $A = \\{1; 2; 3; 4\\}$ và $B = \\{3; 4; 5; 6\\}$. Tập hợp $A \\cap B$ là:",
+                options: [
+                    "$\\{3; 4\\}$",
+                    "$\\{1; 2; 5; 6\\}$",
+                    "$\\{1; 2\\}$",
+                    "$\\{1; 2; 3; 4; 5; 6\\}$"
+                ],
+                correct: 0,
+                explanation: "Giao của hai tập hợp $A$ và $B$ ($A \\cap B$) gồm các phần tử vừa thuộc $A$ vừa thuộc $B$, đó là các phần tử 3 và 4.",
+                points: 0.5
+            },
+            {
+                id: 3, type: 'mc',
+                question: "Miền nghiệm của bất phương trình $2x + y < 3$ chứa điểm nào sau đây?",
+                options: [
+                    "$(2; 1)$",
+                    "$(1; 2)$",
+                    "$(1; 0)$",
+                    "$(0; 4)$"
+                ],
+                correct: 2,
+                explanation: "Thay tọa độ $(1; 0)$ vào bất phương trình: $2(1) + 0 = 2 < 3$ (Thỏa mãn/Đúng). Các điểm khác cho kết quả $\\ge 3$.",
+                points: 0.5
+            },
+            {
+                id: 4, type: 'mc',
+                question: "Hệ bất phương trình nào sau đây là hệ bất phương trình bậc nhất hai ẩn?",
+                options: [
+                    "$\\begin{cases} x + y^2 \\le 3 \\\\ x - y > 1 \\end{cases}$",
+                    "$\\begin{cases} 2x + y \\le 4 \\\\ -x + 3y > 5 \\end{cases}$",
+                    "$\\begin{cases} xy > 2 \\\\ x + y < 1 \\end{cases}$",
+                    "$\\begin{cases} x^2 + y^2 < 4 \\\\ x > 0 \\end{cases}$"
+                ],
+                correct: 1,
+                explanation: "Hệ bất phương trình bậc nhất hai ẩn chỉ chứa các ẩn $x, y$ ở bậc nhất (không chứa $x^2, y^2$ hay tích $xy$). Đáp án B thỏa mãn.",
+                points: 0.5
+            },
+            {
+                id: 5, type: 'mc',
+                question: "Cho góc $\\alpha$ thỏa mãn $0^\\circ < \\alpha < 180^\\circ$. Khẳng định nào sau đây là đúng?",
+                options: [
+                    "$\\sin(180^\\circ - \\alpha) = -\\sin \\alpha$",
+                    "$\\cos(180^\\circ - \\alpha) = \\cos \\alpha$",
+                    "$\\tan(180^\\circ - \\alpha) = -\\tan \\alpha$ (với $\\alpha \\neq 90^\\circ$)",
+                    "$\\cot(180^\\circ - \\alpha) = \\cot \\alpha$"
+                ],
+                correct: 2,
+                explanation: "Hai góc bù nhau có sin bằng nhau, còn cos, tan, cot đối nhau: $\\tan(180^\\circ - \\alpha) = -\\tan \\alpha$.",
+                points: 0.5
+            },
+            {
+                id: 6, type: 'mc',
+                question: "Tam giác $ABC$ có $BC = a, CA = b, AB = c$. Công thức Định lý Côsin nào sau đây là đúng?",
+                options: [
+                    "$a^2 = b^2 + c^2 - 2bc \\cos A$",
+                    "$a^2 = b^2 + c^2 + 2bc \\cos A$",
+                    "$a^2 = b^2 + c^2 - 2bc \\sin A$",
+                    "$a^2 = b^2 + c^2 - bc \\cos A$"
+                ],
+                correct: 0,
+                explanation: "Theo Định lý Côsin trong tam giác: $a^2 = b^2 + c^2 - 2bc \\cos A$.",
+                points: 0.5
+            },
+            {
+                id: 7, type: 'mc',
+                question: "Cho tam giác $ABC$ có $AB = 4$, $AC = 6$ và góc $\\widehat{A} = 60^\\circ$. Diện tích của tam giác $ABC$ bằng:",
+                options: [
+                    "$6\\sqrt{3}$",
+                    "$12$",
+                    "$12\\sqrt{3}$",
+                    "$6$"
+                ],
+                correct: 0,
+                explanation: "Công thức diện tích: $S = \\frac{1}{2} b c \\sin A = \\frac{1}{2} \\cdot 6 \\cdot 4 \\cdot \\sin 60^\\circ = 12 \\cdot \\frac{\\sqrt{3}}{2} = 6\\sqrt{3}$.",
+                points: 0.5
+            },
+            {
+                id: 8, type: 'mc',
+                question: "Mệnh đề phủ định của mệnh đề '$P: \\forall x \\in \\mathbb{R}, x^2 + 1 > 0$' là:",
+                options: [
+                    "$\\overline{P}: \\exists x \\in \\mathbb{R}, x^2 + 1 \\le 0$",
+                    "$\\overline{P}: \\forall x \\in \\mathbb{R}, x^2 + 1 \\le 0$",
+                    "$\\overline{P}: \\exists x \\in \\mathbb{R}, x^2 + 1 < 0$",
+                    "$\\overline{P}: \\forall x \\in \\mathbb{R}, x^2 + 1 < 0$"
+                ],
+                correct: 0,
+                explanation: "Phủ định của lượng từ $\\forall$ là $\\exists$, phủ định của bất đẳng thức $>$ là $\\le$. Do đó $\\overline{P}: \\exists x \\in \\mathbb{R}, x^2 + 1 \\le 0$.",
+                points: 0.5
+            },
+
+            // --- ĐÚNG / SAI (8 câu: Q9 - Q16) ---
+            {
+                id: 9, type: 'tf',
+                question: "Cho hai tập hợp $A = [-2; 3)$ và $B = (1; 5]$. Khi đó $A \\setminus B = [-2; 1]$.",
+                correct: true,
+                explanation: "Hiệu $A \\setminus B$ gồm các phần tử thuộc $A$ nhưng không thuộc $B$. Vì $B = (1; 5]$ nên các phần tử $\\le 1$ thuộc $A$ sẽ còn lại, tức là $A \\setminus B = [-2; 1]$. Mệnh đề này ĐÚNG.",
+                points: 0.5
+            },
+            {
+                id: 10, type: 'tf',
+                question: "Tập hợp $X = \\{a; b; c\\}$ có tất cả 6 tập hợp con.",
+                correct: false,
+                explanation: "Số tập hợp con của tập hợp có 3 phần tử là $2^3 = 8$ (bao gồm cả tập rỗng $\\emptyset$ và chính $X$). Mệnh đề này SAI.",
+                points: 0.5
+            },
+            {
+                id: 11, type: 'tf',
+                question: "Cặp số $(2; -1)$ là một nghiệm của bất phương trình $3x - 2y > 5$.",
+                correct: true,
+                explanation: "Thay $x = 2, y = -1$ vào vế trái: $3(2) - 2(-1) = 6 + 2 = 8 > 5$ (Đúng). Mệnh đề này ĐÚNG.",
+                points: 0.5
+            },
+            {
+                id: 12, type: 'tf',
+                question: "Trong mặt phẳng $Oxy$, đường thẳng $d: x + y = 2$ chia mặt phẳng thành hai nửa mặt phẳng, trong đó nửa mặt phẳng chứa gốc tọa độ $O(0;0)$ là miền nghiệm của $x + y > 2$.",
+                correct: false,
+                explanation: "Thay $O(0;0)$ vào $x+y$ ta được $0 + 0 = 0 < 2$. Do đó gốc $O$ không thuộc miền nghiệm $x + y > 2$. Mệnh đề này SAI.",
+                points: 0.5
+            },
+            {
+                id: 13, type: 'tf',
+                question: "Giá trị của biểu thức $A = \\sin^2 30^\\circ + \\cos^2 30^\\circ + \\tan 45^\\circ$ bằng $2$.",
+                correct: true,
+                explanation: "Ta có $\\sin^2 30^\\circ + \\cos^2 30^\\circ = 1$ và $\\tan 45^\\circ = 1$. Do đó $A = 1 + 1 = 2$. Mệnh đề này ĐÚNG.",
+                points: 0.5
+            },
+            {
+                id: 14, type: 'tf',
+                question: "Trong mọi tam giác $ABC$, ta luôn có hệ thức $\\frac{a}{\\sin A} = R$ (với $R$ là bán kính đường tròn ngoại tiếp).",
+                correct: false,
+                explanation: "Theo Định lý Sin: $\\frac{a}{\\sin A} = 2R$. Do đó công thức $\\frac{a}{\\sin A} = R$ là SAI.",
+                points: 0.5
+            },
+            {
+                id: 15, type: 'tf',
+                question: "Với góc tù $\\alpha$ ($90^\\circ < \\alpha < 180^\\circ$), giá trị của $\\cos \\alpha$ luôn mang dấu âm ($< 0$).",
+                correct: true,
+                explanation: "Trên đường tròn lượng giác, hoành độ của góc tù nằm ở góc phần tư thứ II nên $\\cos \\alpha < 0$. Mệnh đề này ĐÚNG.",
+                points: 0.5
+            },
+            {
+                id: 16, type: 'tf',
+                question: "Tam giác $ABC$ có ba cạnh $a=3, b=4, c=5$ là một tam giác vuông có diện tích bằng $6$.",
+                correct: true,
+                explanation: "Vì $3^2 + 4^2 = 5^2$ ($9+16=25$) nên tam giác vuông tại đỉnh đối diện cạnh $c$. Diện tích $S = \\frac{1}{2} \\cdot 3 \\cdot 4 = 6$. Mệnh đề này ĐÚNG.",
+                points: 0.5
+            },
+
+            // --- TỰ LUẬN (4 câu: Q17 - Q20) ---
+            {
+                id: 17, type: 'essay',
+                question: "<b>Câu 17 (Tự luận):</b> Cho hai tập hợp $A = [-3; 2)$ và $B = (-1; 4]$. Xác định các tập hợp $A \\cap B$ và $A \\cup B$.",
+                modelAnswer: "Giao: $A \\cap B = (-1; 2)$. Hợp: $A \\cup B = [-3; 4]$.",
+                keywords: ["(-1; 2)", "[-3; 4]", "(-1;2)", "[-3;4]"],
+                rubric: "• Đạt điểm tối đa (0.5đ): Xác định đúng cả $A \\cap B = (-1; 2)$ và $A \\cup B = [-3; 4]$.\n• Đạt 0.25đ: Chỉ xác định đúng 1 trong 2 tập hợp.",
+                points: 0.5
+            },
+            {
+                id: 18, type: 'essay',
+                question: "<b>Câu 18 (Tự luận):</b> Hãy nêu cách biểu diễn miền nghiệm của bất phương trình $x + 2y \\le 4$ trên mặt phẳng tọa độ $Oxy$ và chỉ ra một điểm thuộc miền nghiệm.",
+                modelAnswer: "1. Vẽ đường thẳng $d: x + 2y = 4$ đi qua $(4;0)$ và $(0;2)$.\n2. Thử điểm $O(0;0)$: $0 + 2(0) = 0 \\le 4$ (đúng).\n3. Miền nghiệm là nửa mặt phẳng bờ $d$ chứa gốc $O(0;0)$ (kể cả đường thẳng $d$).\n4. Điểm thuộc miền nghiệm: $O(0;0)$ hoặc $(1;1)$.",
+                keywords: ["nửa mặt phẳng", "gốc", "0;0", "bờ"],
+                rubric: "• Đạt điểm tối đa (0.5đ): Nêu đúng đường thẳng biên, chọn gốc O(0;0) kiểm tra và kết luận nửa mặt phẳng chứa O kèm ví dụ điểm thuộc miền nghiệm.\n• Đạt 0.25đ: Chỉ nêu đúng miền nghiệm hoặc chỉ đưa ra ví dụ điểm đúng.",
+                points: 0.5
+            },
+            {
+                id: 19, type: 'essay',
+                question: "<b>Câu 19 (Tự luận):</b> Cho tam giác $ABC$ có cạnh $b = 7, c = 5$ và góc $\\widehat{A} = 60^\\circ$. Tính độ dài cạnh $a$ và diện tích $S$ của tam giác $ABC$.",
+                modelAnswer: "• Tính cạnh $a$: $a^2 = b^2 + c^2 - 2bc \\cos A = 7^2 + 5^2 - 2 \\cdot 7 \\cdot 5 \\cdot \\cos 60^\\circ = 49 + 25 - 35 = 39 \\implies a = \\sqrt{39}$.\n• Tính diện tích $S$: $S = \\frac{1}{2}bc \\sin A = \\frac{1}{2} \\cdot 7 \\cdot 5 \\cdot \\frac{\\sqrt{3}}{2} = \\frac{35\\sqrt{3}}{4}$.",
+                keywords: ["sqrt(39)", "\\sqrt{39}", "39", "35\\sqrt{3}/4", "35*sqrt(3)/4"],
+                rubric: "• Đạt điểm tối đa (0.5đ): Tính đúng $a = \\sqrt{39}$ (hoặc $\\approx 6.24$) và diện tích $S = \\frac{35\\sqrt{3}}{4}$ (hoặc $\\approx 15.15$).\n• Đạt 0.25đ: Tính đúng 1 trong 2 yêu cầu.",
+                points: 0.5
+            },
+            {
+                id: 20, type: 'essay',
+                question: "<b>Câu 20 (Tự luận):</b> Lớp 10A có 45 học sinh, trong đó có 25 học sinh thích môn Toán, 20 học sinh thích môn Ngữ văn và 10 học sinh không thích cả hai môn này. Hỏi có bao nhiêu học sinh thích cả hai môn Toán và Ngữ văn?",
+                modelAnswer: "Số học sinh thích ít nhất một trong hai môn là: $45 - 10 = 35$ (học sinh).\nSố học sinh thích cả hai môn Toán và Ngữ văn là: $25 + 20 - 35 = 10$ (học sinh).",
+                keywords: ["10", "10 học sinh"],
+                rubric: "• Đạt điểm tối đa (0.5đ): Tính ra đúng kết quả 10 học sinh có lời giải/phép tính hợp lý.\n• Đạt 0.25đ: Viết đúng công thức tập hợp $N(A \\cup B) = N(A) + N(B) - N(A \\cap B)$ nhưng tính nhầm số.",
+                points: 0.5
+            }
+        ];
+
+        // App state
+        let currentIndex = 0;
+        let userAnswers = {};
+        let timeLeft = 45 * 60; // 45 minutes
+        let timerInterval = null;
+        let isSubmitted = false;
+
+        window.onload = function() {
+            renderPalette();
+            loadQuestion(0);
+            startTimer();
+        };
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài.");
+                    submitQuiz();
+                    return;
+                }
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('time-display').innerText = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function renderPalette() {
+            const palette = document.getElementById('question-palette');
+            palette.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const isAnswered = userAnswers[q.id] !== undefined && userAnswers[q.id] !== "";
+                const isCurrent = idx === currentIndex;
+                
+                let btnClass = "h-9 rounded-lg font-semibold text-xs flex items-center justify-center transition border cursor-pointer ";
+                if (isCurrent) {
+                    btnClass += "border-indigo-600 ring-2 ring-indigo-200 bg-white text-indigo-700 font-bold";
+                } else if (isAnswered) {
+                    btnClass += "bg-emerald-500 border-emerald-500 text-white";
+                } else {
+                    btnClass += "bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200";
+                }
+
+                palette.innerHTML += `
+                    <button onclick="goToQuestion(${idx})" class="${btnClass}">
+                        ${idx + 1}
+                    </button>
+                `;
+            });
+
+            const answeredCount = Object.keys(userAnswers).filter(k => userAnswers[k] !== undefined && userAnswers[k] !== "").length;
+            document.getElementById('answered-count').innerText = `${answeredCount}/20 đã làm`;
+            const percent = (answeredCount / 20) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function loadQuestion(index) {
+            currentIndex = index;
+            const q = questions[index];
+            const container = document.getElementById('question-card');
+
+            let optionsHtml = '';
+            if (q.type === 'mc') {
+                const labels = ['A', 'B', 'C', 'D'];
+                q.options.forEach((opt, optIdx) => {
+                    const isSelected = userAnswers[q.id] === optIdx;
+                    optionsHtml += `
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl border transition cursor-pointer ${isSelected ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 font-medium' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}">
+                            <input type="radio" name="question_${q.id}" value="${optIdx}" ${isSelected ? 'checked' : ''} onchange="saveAnswer(${q.id}, ${optIdx})" ${isSubmitted ? 'disabled' : ''} class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                            <span><strong class="mr-1.5">${labels[optIdx]}.</strong> ${opt}</span>
+                        </label>
+                    `;
+                });
+            } else if (q.type === 'tf') {
+                const isTrueSelected = userAnswers[q.id] === true;
+                const isFalseSelected = userAnswers[q.id] === false;
+                optionsHtml = `
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <label class="flex items-center justify-center gap-3 p-4 rounded-xl border transition cursor-pointer ${isTrueSelected ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}">
+                            <input type="radio" name="question_${q.id}" value="true" ${isTrueSelected ? 'checked' : ''} onchange="saveAnswer(${q.id}, true)" ${isSubmitted ? 'disabled' : ''} class="text-emerald-600">
+                            <span>ĐÚNG</span>
+                        </label>
+                        <label class="flex items-center justify-center gap-3 p-4 rounded-xl border transition cursor-pointer ${isFalseSelected ? 'border-rose-600 bg-rose-50 text-rose-900 font-bold' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}">
+                            <input type="radio" name="question_${q.id}" value="false" ${isFalseSelected ? 'checked' : ''} onchange="saveAnswer(${q.id}, false)" ${isSubmitted ? 'disabled' : ''} class="text-rose-600">
+                            <span>SAI</span>
+                        </label>
+                    </div>
+                `;
+            } else if (q.type === 'essay') {
+                const val = userAnswers[q.id] || '';
+                optionsHtml = `
+                    <div class="mt-4 flex flex-col gap-2">
+                        <label class="text-xs font-semibold text-slate-500 uppercase">Nhập lời giải tự luận của bạn:</label>
+                        <textarea rows="5" oninput="saveAnswer(${q.id}, this.value)" ${isSubmitted ? 'readonly' : ''} placeholder="Nhập câu trả lời hoặc tóm tắt các bước giải..." class="w-full p-3.5 rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-sm outline-none bg-slate-50/50">${val}</textarea>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 uppercase">
+                            ${q.type === 'mc' ? 'Trắc nghiệm 4 lựa chọn' : q.type === 'tf' ? 'Câu hỏi Đúng / Sai' : 'Câu hỏi Tự luận'}
+                        </span>
+                        <span class="text-xs font-semibold text-slate-500">Thang điểm: ${q.points}đ</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed mb-4">${index + 1}. ${q.question}</h3>
+                    <div class="flex flex-col gap-3">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('question-indicator').innerText = `Câu ${index + 1} / 20`;
+            document.getElementById('btn-prev').disabled = index === 0;
+            document.getElementById('btn-next').innerText = index === questions.length - 1 ? 'Nộp bài' : 'Câu sau';
+            document.getElementById('btn-next').onclick = index === questions.length - 1 ? confirmSubmit : nextQuestion;
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+
+            renderPalette();
+        }
+
+        function saveAnswer(qId, value) {
+            if (isSubmitted) return;
+            userAnswers[qId] = value;
+            renderPalette();
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) loadQuestion(currentIndex - 1);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) loadQuestion(currentIndex + 1);
+        }
+
+        function goToQuestion(index) {
+            loadQuestion(index);
+        }
+
+        function confirmSubmit() {
+            if (isSubmitted) {
+                document.getElementById('result-modal').classList.remove('hidden');
+                return;
+            }
+            const answeredCount = Object.keys(userAnswers).filter(k => userAnswers[k] !== undefined && userAnswers[k] !== "").length;
+            const unanswered = 20 - answeredCount;
+            
+            const msg = unanswered > 0 
+                ? `Bạn còn ${unanswered} câu chưa hoàn thành. Bạn có chắc chắn muốn nộp bài?` 
+                : `Bạn đã trả lời đầy đủ 20/20 câu hỏi. Xác nhận nộp bài?`;
+            
+            document.getElementById('confirm-msg').innerText = msg;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+        }
+
+        function evaluateEssay(question, userText) {
+            if (!userText || userText.trim() === "") return { score: 0, feedback: "Chưa có câu trả lời." };
+            
+            const lowerUserText = userText.toLowerCase();
+            let matchedKeywords = 0;
+
+            question.keywords.forEach(kw => {
+                if (lowerUserText.includes(kw.toLowerCase())) {
+                    matchedKeywords++;
+                }
+            });
+
+            if (matchedKeywords >= 2 || (question.keywords.length <= 2 && matchedKeywords >= 1)) {
+                return { 
+                    score: question.points, 
+                    feedback: "Nội dung lời giải đầy đủ và chính xác với đáp án chuẩn." 
+                };
+            } else if (matchedKeywords === 1) {
+                return { 
+                    score: question.points / 2, 
+                    feedback: "Đã nêu được một phần ý đúng nhưng chưa trọn vẹn hoặc thiếu các bước chính." 
+                };
+            } else {
+                return { 
+                    score: 0, 
+                    feedback: "Cách diễn đạt hoặc kết quả chưa chính xác với yêu cầu bài toán." 
+                };
+            }
+        }
+
+        function submitQuiz() {
+            closeConfirmModal();
+            clearInterval(timerInterval);
+            isSubmitted = true;
+
+            let objScore = 0;
+            let objCorrectCount = 0;
+            let essayScore = 0;
+
+            questions.forEach(q => {
+                const userAns = userAnswers[q.id];
+                if (q.type === 'mc' || q.type === 'tf') {
+                    if (userAns === q.correct) {
+                        objScore += q.points;
+                        objCorrectCount++;
+                    }
+                } else if (q.type === 'essay') {
+                    const evalRes = evaluateEssay(q, userAns);
+                    essayScore += evalRes.score;
+                }
+            });
+
+            const totalScore = objScore + essayScore;
+
+            document.getElementById('res-score').innerText = `${totalScore.toFixed(1)} / 10.0`;
+            document.getElementById('res-objective').innerText = `${objCorrectCount} / 16 câu`;
+            document.getElementById('res-essay').innerText = `${essayScore.toFixed(1)} / 2.0 điểm`;
+
+            // Build Detailed Review Section
+            const reviewContainer = document.getElementById('detailed-review');
+            reviewContainer.innerHTML = '<h3 class="font-bold text-slate-800 text-lg mb-2">Chi tiết từng câu hỏi & Lời giải:</h3>';
+
+            questions.forEach((q, idx) => {
+                const userAns = userAnswers[q.id];
+                let isCorrect = false;
+                let userAnsText = "Chưa trả lời";
+                let correctAnsText = "";
+                let feedbackText = "";
+
+                if (q.type === 'mc') {
+                    const labels = ['A', 'B', 'C', 'D'];
+                    if (userAns !== undefined) userAnsText = `${labels[userAns]}. ${q.options[userAns]}`;
+                    correctAnsText = `${labels[q.correct]}. ${q.options[q.correct]}`;
+                    isCorrect = userAns === q.correct;
+                    feedbackText = isCorrect ? "Trả lời chính xác." : (userAns === undefined ? "Chưa chọn đáp án." : "Lựa chọn chưa đúng.");
+                } else if (q.type === 'tf') {
+                    if (userAns !== undefined) userAnsText = userAns ? "Đúng" : "Sai";
+                    correctAnsText = q.correct ? "Đúng" : "Sai";
+                    isCorrect = userAns === q.correct;
+                    feedbackText = isCorrect ? "Trả lời chính xác." : (userAns === undefined ? "Chưa chọn đáp án." : "Đánh giá Đúng/Sai chưa đúng.");
+                } else if (q.type === 'essay') {
+                    userAnsText = userAns && userAns.trim() !== "" ? userAns : "(Chưa nhập bài làm)";
+                    const evalRes = evaluateEssay(q, userAns);
+                    isCorrect = evalRes.score === q.points;
+                    feedbackText = `[Đạt ${evalRes.score}/${q.points}đ] ${evalRes.feedback}`;
+                }
+
+                let statusBadge = "";
+                if (q.type === 'essay') {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-700 text-xs font-semibold">Tự luận</span>`;
+                } else if (isCorrect) {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-semibold">Đúng (+${q.points}đ)</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-md bg-rose-100 text-rose-700 text-xs font-semibold">Sai (0đ)</span>`;
+                }
+
+                reviewContainer.innerHTML += `
+                    <div class="p-4 rounded-xl border ${isCorrect ? 'border-slate-200 bg-white' : 'border-rose-100 bg-rose-50/20'} flex flex-col gap-2 text-sm">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="font-bold text-slate-800">Câu ${idx + 1}: ${q.question}</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="text-slate-600 mt-1">
+                            <div><strong>Bài làm của bạn:</strong> <span class="${isCorrect ? 'text-emerald-700 font-medium' : 'text-rose-600 font-medium'}">${userAnsText}</span></div>
+                            ${q.type !== 'essay' ? `<div><strong>Đáp án đúng:</strong> <span class="text-indigo-700 font-medium">${correctAnsText}</span></div>` : ''}
+                        </div>
+                        <div class="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 text-xs text-slate-700 mt-1">
+                            <div class="font-semibold text-indigo-900 mb-1">Lời giải chi tiết & Thang điểm:</div>
+                            <div class="whitespace-pre-line mb-1">${q.type === 'essay' ? q.modelAnswer : q.explanation}</div>
+                            ${q.rubric ? `<div class="mt-2 pt-2 border-t border-indigo-100 text-indigo-800"><strong>Thang điểm chi tiết:</strong>\n${q.rubric}</div>` : ''}
+                        </div>
+                        <div class="text-xs text-slate-500 italic mt-0.5">Nhận xét: ${feedbackText}</div>
+                    </div>
+                `;
+            });
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+
+            document.getElementById('result-modal').classList.remove('hidden');
+            loadQuestion(currentIndex);
+        }
+
+        function resetQuiz() {
+            isSubmitted = false;
+            userAnswers = {};
+            currentIndex = 0;
+            timeLeft = 45 * 60;
+            closeResultModal();
+            renderPalette();
+            loadQuestion(0);
+            startTimer();
+        }
+    </script>
+</body>
+</html>
